@@ -1,13 +1,15 @@
 package COnsultas;
 
+import Interfaces.Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Metodos {
 
-    
+    Principal objP = new Principal();
     
      public static int añadirAutorYTitulo(String autor, String titulo, String ruta) {
         String sql = "INSERT INTO autores(nombre) VALUES(?)";
@@ -202,4 +204,43 @@ public class Metodos {
         return cuenta;
     }
     
+     public static int contarLibro(String libro, String ruta){
+        String sql = "Select count(titulo) from libros where titulo= (?)";    
+        int cuenta= 0;
+        try (Connection conn = Conexion.connect(ruta);
+             PreparedStatement pstmt  = conn.prepareStatement(sql)){
+            
+            // set the value
+            pstmt.setString(1,libro);
+            //
+            ResultSet rs  = pstmt.executeQuery();
+            
+           cuenta = rs.getInt(1);
+        } catch (SQLException e) {
+            
+        }
+        return cuenta;
+    }
+    
+    public void selectAll(String ruta){
+        String sql = "SELECT isbn, titulo, nombre FROM libros INNER JOIN autor ON autor.id = libros.idautor";
+        
+        try (Connection conn = Conexion.connect(ruta);
+             Statement stmt  = conn.createStatement();
+             ResultSet rs    = stmt.executeQuery(sql)){
+            
+            // loop through the result set
+            while (rs.next()) {
+                Object[] row = { rs.getInt("isbn"), rs.getString("titulo"), rs.getString("nombre")};
+                 objP.crearLinea(row);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    } 
+     
+     
+     
+     
+     
 }

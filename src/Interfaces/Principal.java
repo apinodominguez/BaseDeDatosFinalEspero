@@ -7,6 +7,7 @@ package Interfaces;
 
 import COnsultas.Conexion;
 import COnsultas.Metodos;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -30,6 +31,12 @@ public class Principal extends javax.swing.JFrame {
         this.ruta = ruta;
     }
 
+    public void crearLinea(Object[] row){
+        DefaultTableModel model = (DefaultTableModel) tablaLibros.getModel();
+        model.addRow(row);
+    }
+    
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -52,6 +59,9 @@ public class Principal extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         botonBorrar = new javax.swing.JButton();
         botonActualizar = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tablaLibros = new javax.swing.JTable();
+        botonMostrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,6 +101,23 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
+        tablaLibros.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ISBN", "Titulo", "Autor"
+            }
+        ));
+        jScrollPane1.setViewportView(tablaLibros);
+
+        botonMostrar.setText("MOSTRAR");
+        botonMostrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonMostrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -105,7 +132,9 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(botonBorrar)
                         .addGap(18, 18, 18)
-                        .addComponent(botonActualizar))
+                        .addComponent(botonActualizar)
+                        .addGap(18, 18, 18)
+                        .addComponent(botonMostrar))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(etiquetaR)
@@ -117,8 +146,9 @@ public class Principal extends javax.swing.JFrame {
                             .addComponent(textoBD)
                             .addComponent(textoA, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                             .addComponent(textoT)
-                            .addComponent(textoI))))
-                .addContainerGap(29, Short.MAX_VALUE))
+                            .addComponent(textoI)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -139,12 +169,15 @@ public class Principal extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(textoA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(89, 89, 89)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(botonCrear)
                     .addComponent(jButton1)
                     .addComponent(botonBorrar)
-                    .addComponent(botonActualizar))
+                    .addComponent(botonActualizar)
+                    .addComponent(botonMostrar))
                 .addContainerGap())
         );
 
@@ -210,6 +243,11 @@ public class Principal extends javax.swing.JFrame {
         
     }//GEN-LAST:event_botonActualizarActionPerformed
 
+    private void botonMostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonMostrarActionPerformed
+        Metodos objM = new Metodos();
+        objM.selectAll(ruta);
+    }//GEN-LAST:event_botonMostrarActionPerformed
+
     
     
     
@@ -252,11 +290,14 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton botonActualizar;
     private javax.swing.JButton botonBorrar;
     private javax.swing.JButton botonCrear;
+    private javax.swing.JButton botonMostrar;
     private javax.swing.JLabel etiquetaR;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tablaLibros;
     private javax.swing.JTextField textoA;
     private javax.swing.JTextField textoBD;
     private javax.swing.JTextField textoI;
