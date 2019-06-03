@@ -7,6 +7,11 @@ package Interfaces;
 
 import COnsultas.Conexion;
 import COnsultas.Metodos;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -224,28 +229,48 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void botonBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBorrarActionPerformed
-        int fallo = 0;
-        if (!textoI.getText().isEmpty() && textoA.getText().isEmpty()){
-            fallo = Metodos.borrarISBN(Integer.parseInt(textoI.getText()), ruta);
-            
-        }
-        else if(!textoA.getText().isEmpty() && textoI.getText().isEmpty()){
-            fallo = Metodos.borrarAutor(textoA.getText(), ruta);
-            System.out.println("tu madre");
+        int cont = 0;
+        if (!textoI.getText().isEmpty()){
+            cont = Metodos.borrarISBN(Integer.parseInt(textoI.getText()), ruta);
+            System.out.println("Se han borrado " + cont + " instancias");
         }
         else{
-            
+            System.out.println("Para borrar introduce solamente el ISBN del libro a borrar");
         }
         
     }//GEN-LAST:event_botonBorrarActionPerformed
 
     private void botonActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonActualizarActionPerformed
+        int cont = 0;
+        if (!textoI.getText().isEmpty() && !textoT.getText().isEmpty() && !textoA.getText().isEmpty()){
+            cont = Metodos.actualizarLibros(textoT.getText(), Integer.parseInt(textoI.getText()), textoA.getText(), ruta);
+            System.out.println("Se ha introducido " + cont + " instancias");
+        }
+        else{
+            System.out.println("Introduce todods los campos para continuar");
+        }
         
     }//GEN-LAST:event_botonActualizarActionPerformed
 
     private void botonMostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonMostrarActionPerformed
-        Metodos objM = new Metodos();
-        objM.selectAll(ruta);
+        int cont = 0;
+        if (textoI.getText().isEmpty() && textoT.getText().isEmpty() && textoA.getText().isEmpty()){
+            cont = selectAll(ruta);
+             System.out.println("Se han mostrado " + cont + " instancias");
+        }    
+        else{
+            if (!textoT.getText().isEmpty()){
+             cont = selectAllTitulo(textoT.getText(),ruta);
+                System.out.println("Se han mostrado " + cont + "instancias");
+            }
+            else if(!textoA.getText().isEmpty()){
+                cont = selectAllAutor(textoA.getText(), ruta);
+                System.out.println("Se han mostrado " + cont + "instancias");
+            }
+            else{
+                System.out.println("Rellena titulo o autor o ninguno para mostrar la tabla correspondiente");
+            }
+        }    
     }//GEN-LAST:event_botonMostrarActionPerformed
 
     
@@ -286,6 +311,80 @@ public class Principal extends javax.swing.JFrame {
         });
     }
 
+    // Se que esta parte esta mal aquí, pero no conseguí solucionarlo
+    public int selectAll(String ruta){
+        String sql = "SELECT isbn, titulo, nombre FROM libros INNER JOIN autores ON autores.id = libros.idautor";
+        int cont = 0;
+        
+        try (Connection conn = Conexion.connect(ruta);
+             Statement stmt  = conn.createStatement();
+             ResultSet rs    = stmt.executeQuery(sql)){
+            
+            // loop through the result set
+            while (rs.next()) {
+                Object[] row = { rs.getInt("isbn"), rs.getString("titulo"), rs.getString("nombre")};
+                 DefaultTableModel model = (DefaultTableModel) tablaLibros.getModel();
+                model.addRow(row);
+                cont ++;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return cont;
+    }
+    
+    public int selectAllTitulo(String titulo, String ruta){
+        String sql = "SELECT isbn, titulo, nombre FROM libros INNER JOIN autores ON autores.id = libros.idautor WHERE titulo = (?)";
+        int cont = 0;
+         try (Connection conn = Conexion.connect(ruta);
+             PreparedStatement pstmt  = conn.prepareStatement(sql)){
+             pstmt.setString(1,titulo);
+             ResultSet rs    = pstmt.executeQuery();
+            
+            // loop through the result set
+            while (rs.next()) {
+                Object[] row = { rs.getInt("isbn"), rs.getString("titulo"), rs.getString("nombre")};
+                 DefaultTableModel model = (DefaultTableModel) tablaLibros.getModel();
+                model.addRow(row);
+                cont ++;
+            }
+       
+    }   catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+         return cont;
+    }
+    
+     public int selectAllAutor(String autor, String ruta){
+        String sql = "SELECT isbn, titulo, nombre FROM libros INNER JOIN autores ON autores.id = libros.idautor WHERE libros.idautor = (SELECT id FROM autores WHERE nombre = (?)";
+        int cont = 0;
+         try (Connection conn = Conexion.connect(ruta);
+             PreparedStatement pstmt  = conn.prepareStatement(sql)){
+             pstmt.setString(1,autor);
+             ResultSet rs    = pstmt.executeQuery();
+            
+            // loop through the result set
+            while (rs.next()) {
+                Object[] row = { rs.getInt("isbn"), rs.getString("titulo"), rs.getString("nombre")};
+                 DefaultTableModel model = (DefaultTableModel) tablaLibros.getModel();
+                 model.addRow(row);
+                 cont ++;
+            }
+       
+    }   catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+         return cont;
+    }
+        
+    
+    
+
+    
+    
+    
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonActualizar;
     private javax.swing.JButton botonBorrar;
